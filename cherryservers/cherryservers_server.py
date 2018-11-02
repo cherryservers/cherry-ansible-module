@@ -8,56 +8,161 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: my_sample_module
-
-short_description: This is my sample module
-
-version_added: "2.4"
-
+module: cherryservers_server
+short_description: Manage a bare metal servers at Cherry Servers.
 description:
-    - "This is my longer description explaining my sample module"
+     - Manage a bare metal servers at Cherry Servers.
+     - This module has a dependency on cherry >= 0.1.
+version_added: "0.1"
 
 options:
-    name:
-        description:
-            - This is the message to send to the sample module
-        required: true
-    new:
-        description:
-            - Control to demo if the result of this module is changed or not
-        required: false
 
-extends_documentation_fragment:
-    - azure
+  state:
+    description:
+     - Define desired state of the server.
+     - If set to C(present), the module will return back immediately after API call returns.
+     - If set to C(active), the module will wait for I(wait_timeout) for server to be in C(active) state.
+    default: present
+    choices: ['absent', 'active', 'rebooted', 'present', 'stopped', 'running']
+
+  wait_timeout:
+    description:
+     - How long to wait for server to reach 'active' state.
+    default: 1800
+
+  auth_token:
+    description:
+      - Authenticating API token provided by Cherry Servers. You can supply it via
+        CHERRY_AUTH_TOKEN environement variable.
+    required: true
+
+  project_id:
+    description:
+      - ID of project of the servers.
+    required: true
+
+  hostname:
+    description:
+      - Define hostname of server.
+
+  image:
+    description:
+      - Image to install on the server, e.g. 'Ubuntu 16.04 64bit'.
+
+  plan_id:
+    description:
+      - Plan for server creation.
+
+  ssh_key_id:
+    description:
+      - SSH key`s ID to add SSH key to server.
+
+  ssh_label:
+    description:
+      - SSH key`s label to add SSH key to server.
+
+  server_ids:
+    description:
+      - List of server`s IDs on which to operate.
+
+  region:
+    description:
+      - Region of the server.
+
+  cout:
+    description:
+      - Amount of servers to create.
+    default: 1
+
+  count_offset:
+    description:
+      - From which number to start the count.
+    default: 1
+
+requirements:
+  - "cherry"
+  - "python >= 2.6"
 
 author:
-    - Your Name (@yourhandle)
+  -  "Arturas Razinskij <arturas.razinskij@cherryservers.com>"
 '''
 
 EXAMPLES = '''
-# Pass in a message
-- name: Test with a message
-  my_new_test_module:
-    name: hello world
 
-# pass in a message and have changed true
-- name: Test with a message and changed output
-  my_new_test_module:
-    name: hello world
-    new: true
+# Some examples on how to manage servers
 
-# fail the module
-- name: Test failure of the module
-  my_new_test_module:
-    name: fail me
+# Deploy server with added SSH key in it
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Deploy CherryServers Server
+    cherryservers_server:
+      hostname:
+        - server%02d.example.com
+      plan_id: '161'
+      project_id: '79813'
+      image: 'Ubuntu 16.04 64bit'
+      region: 'EU-East-1'
+      state: present
+      count: 1
+      count_offset: 4
+      ssh_label:
+        - john
+        - marius
+
+# Cancel several servers
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Remove CherryServers server
+    cherryservers_server:
+      project_id: '79813'
+      hostname:
+        - 'server03.example.com'
+        - 'server04.example.com'
+        - 'server06.example.com'
+      state: absent
+
+# Deploy several servers and wait to them to be active
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Deploy CherryServers Server
+    cherryservers_server:
+      hostname:
+        - server%02d.example.com
+      plan_id: '161'
+      project_id: '79813'
+      image: 'Ubuntu 16.04 64bit'
+      region: 'EU-East-1'
+      state: active
+      count: 2
+      count_offset: 1
 '''
 
 RETURN = '''
-original_message:
-    description: The original name param that was passed in
-    type: str
-message:
-    description: The output message that the sample module generates
+changed:
+    description: True if server was added, modified or removed.
+    type: bool
+    sample: True
+    returned: always
+server:
+    description: Info of IP address that was added, modified or removed.
+    type: list
+    sample: [
+        {
+            "hostname": "server05.example.com",
+            "image": "Ubuntu 16.04 64bit",
+            "href": "/servers/167939",
+            "id": 167939,
+            "name": "E5-1620v4",
+            "state": "pending"
+        }
+    ]
+    returned: always
 '''
 
 import os
