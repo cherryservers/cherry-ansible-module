@@ -8,56 +8,142 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: my_sample_module
-
-short_description: This is my sample module
-
-version_added: "2.4"
-
+module: cherryservers_ips
+short_description: Adds, modifies or removes floating IPs on Cherry Servers nodes.
 description:
-    - "This is my longer description explaining my sample module"
-
+     - Adds, modifies or removes floating IPs on Cherry Servers nodes.
+version_added: "0.1"
 options:
-    name:
-        description:
-            - This is the message to send to the sample module
-        required: true
-    new:
-        description:
-            - Control to demo if the result of this module is changed or not
-        required: false
+  state:
+    description:
+     - Define desired state of floating IP
+    default: present
+    choices: ['present', 'absent', 'update']
+  auth_token:
+    description:
+      - Authenticating API token provided by Cherry Servers. You can supply it via
+        CHERRY_AUTH_TOKEN environement variable.
+    required: true
+  project_id:
+    description:
+      - ID of project of the servers
+  ptr_record:
+    description:
+      - Your preferable reverse
+  a_record:
+    description:
+      - Easy memorizable hostname
+  routed_to_ip:
+    description:
+      - IP address of the server to route Floating IP to
+  routed_to_hostname:
+    description:
+      -  Hostname of the server to route Floating IP to
+  routed_to_server_id:
+    description:
+      - Server ID of the server to route Floating IP to
+  ip_address_id:
+    description:
+      - Floating IP address ID to update or remove
+  ip_address:
+    description:
+      - Floating IP address to update or remove
+  region:
+    description:
+      - Region of the Floating IP address
+  cout:
+    description:
+      - Count of Floating IP addresses to add
+    default: 1
 
-extends_documentation_fragment:
-    - azure
+requirements:
+  - "cherry"
+  - "python >= 2.6"
 
 author:
-    - Your Name (@yourhandle)
+  -  "Arturas Razinskij <arturas.razinskij@cherryservers.com>"
 '''
 
 EXAMPLES = '''
-# Pass in a message
-- name: Test with a message
-  my_new_test_module:
-    name: hello world
 
-# pass in a message and have changed true
-- name: Test with a message and changed output
-  my_new_test_module:
-    name: hello world
-    new: true
+# Some examples on how to manage floating ips
 
-# fail the module
-- name: Test failure of the module
-  my_new_test_module:
-    name: fail me
+# Add one Floating IP routed to server`s IP address
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id : '79813'
+    region : 'EU-East-1'
+    ptr_record : 'your-preferable-reverse.example.com'
+    a_record : 'easy-memorizable-hostname.cloud.cherryservers.com'
+    routed_to_ip: 'xxx.xxx.xxx.xxx'
+    state: present
+
+# Add several Floating IPs routed to server`s hostname
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id : '79813'
+    region : 'EU-East-1'
+    ptr_record : 'your-preferable-reverse.example.com'
+    a_record : 'easy-memorizable-hostname.cloud.cherryservers.com'
+    routed_to_hostname: 'server04.example.com'
+    state: present
+
+# Modify Floating IP route to different server`s hostname
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id: '79813'
+    ip_address_id: '2593fd9b-a0a1-10ce-13ce-2f7d7ad99eca'
+    ptr_record: 'your-preferable-reverse.example.com'
+    routed_to_hostname: easy-memorizable-hostname
+    a_record: 'arturas1'
+    state: update
+
+# Remove specific Floating IP address
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id: '79813'
+    ip_address: 
+      - 'xxx.xxx.xxx.xxx'
+    state: absent
 '''
 
 RETURN = '''
-original_message:
-    description: The original name param that was passed in
-    type: str
-message:
-    description: The output message that the sample module generates
+changed:
+    description: True if Floating IP address was added, modified or removed.
+    type: bool
+    sample: True
+    returned: always
+ip_address:
+    description: Info of IP address that was added, modified or removed.
+    type: list
+    sample: [
+        {
+            "address": "xxx.xxx.xxx.xxx",
+            "address_family": 4,
+            "cidr": "185.150.116.104/32",
+            "href": "/ips/41fd4733-a3f7-6ede-5896-f63408c0d4c5",
+            "id": "41fd4733-a3f7-6ede-5896-f63408c0d4c5",
+            "ptr_record": "your-preferable-reverse.example.com"
+        }
+    ]
+    returned: always
+
 '''
 
 import os
