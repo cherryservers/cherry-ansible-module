@@ -57,7 +57,7 @@ original_message:
     description: The original name param that was passed in
     type: str
 message:
-    description: The output message that the sample module generates
+    description: The output message that the sample module generatess
 '''
 
 import os
