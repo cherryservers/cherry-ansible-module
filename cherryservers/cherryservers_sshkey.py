@@ -8,56 +8,121 @@ ANSIBLE_METADATA = {
 
 DOCUMENTATION = '''
 ---
-module: my_sample_module
-
-short_description: This is my sample module
-
-version_added: "2.4"
-
+module: cherryservers_server
+short_description: Adds/removes SSH keys to client portal
 description:
-    - "This is my longer description explaining my sample module"
+     - Adds/removes SSH keys to client portal
+     - This module has a dependency on cherry >= 0.1.
+version_added: "0.1"
 
 options:
-    name:
-        description:
-            - This is the message to send to the sample module
-        required: true
-    new:
-        description:
-            - Control to demo if the result of this module is changed or not
-        required: false
+  state:
+    description:
+     - Define desired state of SSH key
+    default: present
+    choices: ['present', 'absent']
 
-extends_documentation_fragment:
-    - azure
+  auth_token:
+    description:
+      - Authenticating API token provided by Cherry Servers. You can supply it via
+        CHERRY_AUTH_TOKEN environement variable.
+    required: true
+
+  label:
+    description:
+      - Label of SSH key.
+
+  fingerprint:
+    description:
+      - Fingerprint of SSH key.
+
+  key_file:
+    description:
+      - Path to SSH key file.
+
+  key:
+    description:
+      - RAW key.
+
+requirements:
+  - "cherry"
+  - "python >= 2.6"
 
 author:
-    - Your Name (@yourhandle)
+  -  "Arturas Razinskij <arturas.razinskij@cherryservers.com>"
 '''
 
 EXAMPLES = '''
-# Pass in a message
-- name: Test with a message
-  my_new_test_module:
-    name: hello world
+# Add ssh key to portal
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Add SSH key
+    cherryservers_sshkey:
+      label: "john"
+      key: "ssh-rsa key-data comment"
+      state: present
 
-# pass in a message and have changed true
-- name: Test with a message and changed output
-  my_new_test_module:
-    name: hello world
-    new: true
+# Add ssh key to portal from path
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage SSH keys
+    cherryservers_sshkey:
+      label: "marius"
+      key_file: key_file.pub
+      state: present
 
-# fail the module
-- name: Test failure of the module
-  my_new_test_module:
-    name: fail me
+# Remove SSH keys by their labels
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Removes SSH keys
+    cherryservers_sshkey:
+      label:
+        - 'john'
+        - 'marius'
+      state: absent
+
+# Removes several ssh keys by path
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Removes SSH keys
+    cherryservers_sshkey:
+      key_file:
+        - key_file_jonas.pub
+        - key_file_kestas.pub
+        - key_file_mantas.pub
+        - key_file_marius.pub
+      state: absent
 '''
 
 RETURN = '''
-original_message:
-    description: The original name param that was passed in
-    type: str
-message:
-    description: The output message that the sample module generatess
+changed:
+    description: True if Floating IP address was added, modified or removed.
+    type: bool
+    sample: True
+    returned: always
+sshkey:
+    description: Info of IP address that was added, modified or removed.
+    type: list
+    sample: [
+        {
+            "created": "2018-11-02T15:15:39+00:00",
+            "fingerprint": "b9:a4:ba:e2:af:de:bb:8c:c5:35:cf:5c:07:3d:b5:db",
+            "href": "/ssh-keys/209",
+            "id": 209,
+            "key": "ssh-rsa AAAAB3NzaC1yc2EAAAAD....EuiNHxjxN+Sxf+Qd06b4kLCY7 john@example.com",
+            "label": "john",
+            "updated": "2018-11-02T15:15:39+00:00"
+        }
+    ]
+    returned: always
 '''
 
 import os
@@ -99,9 +164,7 @@ def run_module():
     ]
 
     result = dict(
-        changed=False,
-        original_message='',
-        message=''
+        changed=False
     )
 
     module = AnsibleModule(
@@ -217,14 +280,19 @@ def add_ssh_keys(module, cherryservers_conn):
     key_file = module.params['key_file']
     ssh_key = module.params['key']
 
-    if len(label) == 1:
-        label = label[0]
+    #module.fail_json(msg=ssh_key[0])
 
-    if len(ssh_key) == 1:
-        ssh_key = ssh_key[0]
+    if label:
+        if len(label) == 1:
+            label = label[0]
+
+    if ssh_key:
+        if len(ssh_key) == 1:
+            ssh_key = ssh_key[0]
     
-    if len(key_file) == 1:
-        key_file = key_file[0]
+    if key_file:
+        if len(key_file) == 1:
+            key_file = key_file[0]
 
     changed = False
 

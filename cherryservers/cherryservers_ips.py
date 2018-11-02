@@ -13,6 +13,7 @@ short_description: Adds, modifies or removes floating IPs on Cherry Servers node
 description:
      - Adds, modifies or removes floating IPs on Cherry Servers nodes.
 version_added: "0.1"
+
 options:
   state:
     description:
@@ -143,7 +144,6 @@ ip_address:
         }
     ]
     returned: always
-
 '''
 
 import os
