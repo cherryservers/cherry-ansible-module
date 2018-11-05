@@ -49,6 +49,14 @@ options:
     description:
       - Image to install on the server, e.g. 'Ubuntu 16.04 64bit'.
 
+  ip_address:
+    description:
+      - List of floating IP addresses to add to new server.
+
+  ip_address_id:
+    description:
+      -  List of floating IP addresses UIDs to add to new server.
+
   plan_id:
     description:
       - Plan for server creation.
