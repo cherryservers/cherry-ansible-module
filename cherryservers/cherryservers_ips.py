@@ -298,6 +298,8 @@ def add_ip_address(module, cherryservers_conn):
         routed_to=routed_to,
         assigned_to=assigned_to)
 
+    check_for_not_found(module, ip)
+
     changed = True
 
     return (changed, ip)
@@ -362,6 +364,8 @@ def get_id_of_floating_ip(module, cherryservers_conn):
 
     current_ips = cherryservers_conn.get_ip_addresses(project_id)
 
+    check_for_not_found(module, current_ips)
+
     if ip_address:
         items = ip_address
         keys_dict = {"%s" % ip['id'] : "%s" % ip['address'] 
@@ -402,6 +406,8 @@ def get_id_for_ip(module, cherryservers_conn):
 
     current_servers = cherryservers_conn.get_servers(project_id)
 
+    check_for_not_found(module, current_servers)
+
     if routed_to_hostname:
         item = routed_to_hostname
         keys_dict = {"%s" % server['id'] : "%s" % server['hostname'] for server in current_servers}
@@ -425,6 +431,11 @@ def get_id_for_ip(module, cherryservers_conn):
         if value == item:
             list_of_keys.append(key)
             uniq_dict[key] = value
+
+    if item not in uniq_dict.values():
+        msg = ("It seems item %s can't be found. Please "
+        "check it and try again." % item)
+        module.fail_json(msg=msg)
 
     if len(list_of_keys) > 1:
         for key in list_of_keys:
@@ -485,9 +496,18 @@ def update_ip_address(module, cherryservers_conn, ip_address_id):
             routed_to,
             assigned_to)
 
+    check_for_not_found(module, ip)
+
     changed = True
 
     return (changed, ip)
+
+def check_for_not_found(module, server):
+
+    if 'code' in server and server['code'] == 404:
+        return module.fail_json(msg=server['message'])
+    else:
+        return
 
 def main():
     run_module()
