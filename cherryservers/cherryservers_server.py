@@ -197,6 +197,8 @@ def run_module():
         project_id = dict(type = 'int', required = True),
         server_id = dict(type='int'),
         server_ids = dict(type='list'),
+        ip_address = dict(type='list'),
+        ip_address_id = dict(type='list'),
         region  = dict(),
         ssh_key_id = dict(type = 'list'),
         ssh_label = dict(type = 'list'),
@@ -401,6 +403,45 @@ def server_power(module, cherryservers_conn, server_id, state):
     
     return (changed, server)
 
+def get_id_of_floating_ip(module, cherryservers_conn):
+
+    """
+    In order to remove floating IP by it's numeric IP
+    address, we need to translate that IP to its UID
+
+    Functions returns list or UIDs.
+    """
+
+    project_id = module.params['project_id']
+    ip_address = module.params['ip_address']
+    ip_address_id = module.params['ip_address_id']
+
+    current_ips = cherryservers_conn.get_ip_addresses(project_id)
+
+    check_for_errors(module, current_ips)
+
+    if ip_address:
+        items = ip_address
+        keys_dict = {"%s" % ip['id'] : "%s" % ip['address'] 
+            for ip in current_ips 
+                if ip['type'] == 'floating-ip'}
+    elif ip_address_id:
+        items = ip_address_id
+        keys_dict = {"%s" % ip['id'] : "%s" % ip['id'] 
+            for ip in current_ips 
+                if ip['type'] == 'floating-ip'}
+    else:
+        return
+
+    uniq_dict = {}
+
+    for item in items:
+        for key,value in keys_dict.items():
+            if value == item:
+                uniq_dict[key] = value
+
+    return list(uniq_dict.keys())
+
 def create_multiple_servers(module, cherryservers_conn):
 
     """
@@ -416,10 +457,20 @@ def create_multiple_servers(module, cherryservers_conn):
     if module.params['ssh_label'] or module.params['ssh_key_id']:
         key_ids = get_ids_for_keys(module, cherryservers_conn)
 
+    if module.params['ip_address'] or module.params['ip_address_id']:
+
+        floating_ip_uids = get_id_of_floating_ip(module, cherryservers_conn)
+        count = module.params['count']
+
+        if count > 1:
+            msg = ("You can add floating IP only to one server at a time. Use "
+            "count less then 1. Current value: %s" % count)
+            module.fail_json(msg=msg)
+
     hostnames = provide_hostnames(module, cherryservers_conn)
 
     for hostname in hostnames:
-        (changed, server) = create_server(module, cherryservers_conn, hostname, key_ids)
+        (changed, server) = create_server(module, cherryservers_conn, hostname, key_ids, floating_ip_uids)
 
         # hostname = "%s.%s" % (index, hostname)
         # (changed, server) = test(hostname)
@@ -432,7 +483,7 @@ def create_multiple_servers(module, cherryservers_conn):
 
     return (changed, servers)
 
-def create_server(module, cherryservers_conn, hostname, ssh_keys):
+def create_server(module, cherryservers_conn, hostname, ssh_keys, floating_ip_uids):
 
     """
     Function for deploy of single server.
@@ -450,14 +501,12 @@ def create_server(module, cherryservers_conn, hostname, ssh_keys):
     region = module.params['region']
     plan_id = module.params['plan_id']
 
-    ips = []
-
     server = cherryservers_conn.create_server(
         project_id=project_id,
         hostname=hostname,
         image=image,
         region=region,
-        ip_addresses=ips,
+        ip_addresses=floating_ip_uids,
         ssh_keys=ssh_keys,
         plan_id=plan_id)
 
