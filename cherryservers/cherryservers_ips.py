@@ -298,7 +298,7 @@ def add_ip_address(module, cherryservers_conn):
         routed_to=routed_to,
         assigned_to=assigned_to)
 
-    check_for_not_found(module, ip)
+    check_for_errors(module, ip)
 
     changed = True
 
@@ -364,7 +364,7 @@ def get_id_of_floating_ip(module, cherryservers_conn):
 
     current_ips = cherryservers_conn.get_ip_addresses(project_id)
 
-    check_for_not_found(module, current_ips)
+    check_for_errors(module, current_ips)
 
     if ip_address:
         items = ip_address
@@ -406,7 +406,7 @@ def get_id_for_ip(module, cherryservers_conn):
 
     current_servers = cherryservers_conn.get_servers(project_id)
 
-    check_for_not_found(module, current_servers)
+    check_for_errors(module, current_servers)
 
     if routed_to_hostname:
         item = routed_to_hostname
@@ -496,15 +496,15 @@ def update_ip_address(module, cherryservers_conn, ip_address_id):
             routed_to,
             assigned_to)
 
-    check_for_not_found(module, ip)
+    check_for_errors(module, ip)
 
     changed = True
 
     return (changed, ip)
 
-def check_for_not_found(module, server):
+def check_for_errors(module, server):
 
-    if 'code' in server and server['code'] == 404:
+    if 'code' in server and (server['code'] == 404 or server['code'] == 400):
         return module.fail_json(msg=server['message'])
     else:
         return

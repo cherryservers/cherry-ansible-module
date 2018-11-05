@@ -395,7 +395,7 @@ def server_power(module, cherryservers_conn, server_id, state):
     else:
         raise Exception("Unknown power state: %s" % state)
 
-    check_for_not_found(module, server)
+    check_for_errors(module, server)
 
     changed = True
     
@@ -461,7 +461,7 @@ def create_server(module, cherryservers_conn, hostname, ssh_keys):
         ssh_keys=ssh_keys,
         plan_id=plan_id)
 
-    check_for_not_found(module, server)
+    check_for_errors(module, server)
     
     changed = True
 
@@ -494,9 +494,9 @@ def wait_for_resource(module, cherryservers_conn, deploying_servers_ids):
 
     raise Exception("Timed out waiting for active device: %s" % server_id)
 
-def check_for_not_found(module, server):
+def check_for_errors(module, server):
 
-    if 'code' in server and server['code'] == 404:
+    if 'code' in server and (server['code'] == 404 or server['code'] == 400):
         return module.fail_json(msg=server['message'])
     else:
         return
@@ -513,7 +513,7 @@ def get_ids_from_hostnames(module, cherryservers_conn, hostnames):
 
     current_servers = cherryservers_conn.get_servers(project_id)
 
-    check_for_not_found(module, current_servers)
+    check_for_errors(module, current_servers)
 
     sid_host_dict = {"%s" % server['id'] : "%s" % server['hostname'] for server in current_servers}
 
