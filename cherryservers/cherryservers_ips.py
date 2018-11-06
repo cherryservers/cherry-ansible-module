@@ -192,17 +192,12 @@ def run_module():
         ('ip_address_id', 'ip_address')
     ]
 
-    required_one_of = [
-        ('ip_address_id', 'ip_address')
-    ]
-
     result = dict(
         changed=False
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
-        required_one_of = required_one_of,
         mutually_exclusive = mutually_exclusive,
         supports_check_mode=True
     )
@@ -219,17 +214,19 @@ def run_module():
     state = module.params['state']
 
     if state in 'present':
-        #(changed, ip) = add_ip_address(module, cherryservers_conn)
+    
         (changed, ip) = add_multiple_ip_addresses(module, cherryservers_conn)
     elif state == 'absent':
 
-        ip_address_id = module.params['ip_address_id']
-        #(changed, ip) = remove_ip_address(module, cherryservers_conn, ip_address_id)
+        if not (module.params['ip_address'] or module.params['ip_address_id']):
+            module.fail_json(msg="one of the following is required: ip_address_id, ip_address")
+
         (changed, ip) = remove_multiple_ip_addresses(module, cherryservers_conn)
     elif state == 'update':
 
-        #ip_address_id = module.params['ip_address_id']
-        #(changed, ip) = update_ip_address(module, cherryservers_conn)
+        if not (module.params['ip_address'] or module.params['ip_address_id']):
+            module.fail_json(msg="one of the following is required: ip_address_id, ip_address")
+    
         (changed, ip) = update_multiple_ip_addresses(module, cherryservers_conn)
     else:
         raise Exception("Unknown state: %s" % state)
