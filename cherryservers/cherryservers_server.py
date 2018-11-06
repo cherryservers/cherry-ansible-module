@@ -553,6 +553,11 @@ def wait_for_resource(module, cherryservers_conn, deploying_servers_ids):
 
 def check_for_errors(module, server):
 
+    """
+    Function for handling 404 & 400 errors, so ansible can fail
+    in normal way, not with tracebacks.
+    """
+
     if 'code' in server and (server['code'] == 404 or server['code'] == 400):
         return module.fail_json(msg=server['message'])
     else:
