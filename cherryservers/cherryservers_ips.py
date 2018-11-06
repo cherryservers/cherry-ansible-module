@@ -192,12 +192,17 @@ def run_module():
         ('ip_address_id', 'ip_address')
     ]
 
+    required_one_of = [
+        ('ip_address_id', 'ip_address')
+    ]
+
     result = dict(
         changed=False
     )
 
     module = AnsibleModule(
         argument_spec=module_args,
+        required_one_of = required_one_of,
         mutually_exclusive = mutually_exclusive,
         supports_check_mode=True
     )
@@ -223,8 +228,9 @@ def run_module():
         (changed, ip) = remove_multiple_ip_addresses(module, cherryservers_conn)
     elif state == 'update':
 
-        ip_address_id = module.params['ip_address_id']
-        (changed, ip) = update_ip_address(module, cherryservers_conn, ip_address_id)
+        #ip_address_id = module.params['ip_address_id']
+        #(changed, ip) = update_ip_address(module, cherryservers_conn)
+        (changed, ip) = update_multiple_ip_addresses(module, cherryservers_conn)
     else:
         raise Exception("Unknown state: %s" % state)
 
@@ -464,19 +470,35 @@ def get_id_for_ip(module, cherryservers_conn):
 
     return list(primary_ip_dict.keys())[0]
 
-def update_ip_address(module, cherryservers_conn, ip_address_id):
+def update_multiple_ip_addresses(module, cherryservers_conn):
+
+    """
+    Function update several floating IP addresses.
+    """
+
+    changed = False
+
+    ips = []
+    changes = []
+
+    floating_ip_uids = get_id_of_floating_ip(module, cherryservers_conn)
+
+    for floating_ip_uid in floating_ip_uids:
+        (changed, ip) = update_ip_address(module, cherryservers_conn, floating_ip_uid)
+        ips.append(ip)
+        changes.append(changed)
+
+    if True in changes:
+        changed = True
+
+    return (changed, ips)
+
+def update_ip_address(module, cherryservers_conn, floating_ip_uid):
 
     """
     Function updates IP address with either
     A record, PRT record, assigned server etc.
     """
-
-    required_params = ('project_id', 'ip_address_id')
-
-    for param in required_params:
-        if not module.params.get(param):
-            module.fail_json(
-                msg="%s parameter is required for ip update." % param)
 
     project_id = module.params['project_id']
     ptr_record = module.params['ptr_record']
@@ -484,13 +506,15 @@ def update_ip_address(module, cherryservers_conn, ip_address_id):
     assigned_to = module.params['assigned_to']
     routed_to = module.params['routed_to']
 
-    ip_id = get_id_for_ip(module, cherryservers_conn)
-
-    routed_to = ip_id
+    if routed_to == None:
+        routed_to = 'null'
+    else:
+        ip_id = get_id_for_ip(module, cherryservers_conn)
+        routed_to = ip_id
 
     ip = cherryservers_conn.update_ip_address(
             project_id, 
-            ip_address_id, 
+            floating_ip_uid, 
             ptr_record, 
             a_record, 
             routed_to,

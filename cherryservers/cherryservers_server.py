@@ -480,9 +480,6 @@ def create_multiple_servers(module, cherryservers_conn):
     for hostname in hostnames:
         (changed, server) = create_server(module, cherryservers_conn, hostname, key_ids, floating_ip_uids)
 
-        # hostname = "%s.%s" % (index, hostname)
-        # (changed, server) = test(hostname)
-
         servers.append(server)
         changes.append(changed)
 
@@ -570,7 +567,6 @@ def get_ids_from_hostnames(module, cherryservers_conn, hostnames):
     in case if hostname is uniq for specified project.
     """
 
-    #hostnames = module.params['hostname']
     project_id = module.params['project_id']
 
     current_servers = cherryservers_conn.get_servers(project_id)
