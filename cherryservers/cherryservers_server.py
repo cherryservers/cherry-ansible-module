@@ -221,7 +221,7 @@ def run_module():
     ]
 
     required_one_of = [
-        ('hostname', 'server_ids')
+        ('hostname', 'server_ids', 'server_id')
     ]
 
     result = dict(

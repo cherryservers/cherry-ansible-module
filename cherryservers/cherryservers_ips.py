@@ -503,11 +503,15 @@ def update_ip_address(module, cherryservers_conn, floating_ip_uid):
     assigned_to = module.params['assigned_to']
     routed_to = module.params['routed_to']
 
-    if routed_to == None:
-        routed_to = 'null'
-    else:
+    routed_to_hostname = module.params['routed_to_hostname']
+    routed_to_server_id = module.params['routed_to_server_id']
+    routed_to_ip = module.params['routed_to_ip']
+
+    if routed_to_hostname or routed_to_server_id or routed_to_ip:
         ip_id = get_id_for_ip(module, cherryservers_conn)
         routed_to = ip_id
+    elif routed_to == None:
+         routed_to = 'null'
 
     ip = cherryservers_conn.update_ip_address(
             project_id, 
