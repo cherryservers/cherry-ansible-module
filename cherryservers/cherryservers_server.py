@@ -474,6 +474,8 @@ def create_multiple_servers(module, cherryservers_conn):
             msg = ("You can add floating IP only to one server at a time. Use "
             "count less then 1. Current value: %s" % count)
             module.fail_json(msg=msg)
+    else:
+        floating_ip_uids = []
 
     hostnames = provide_hostnames(module, cherryservers_conn)
 
