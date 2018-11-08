@@ -303,7 +303,7 @@ def add_ssh_keys(module, cherryservers_conn):
 
     if key_file:
         with open(key_file) as file:
-            ssh_key = file.read()
+            ssh_key = file.read().rstrip()
 
     sshkey = cherryservers_conn.create_ssh_key(label, ssh_key)
 
