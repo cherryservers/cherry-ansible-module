@@ -621,6 +621,8 @@ def terminate_multiple_servers(module, cherryservers_conn):
         hostnames = provide_hostnames(module, cherryservers_conn)
         server_ids = get_ids_from_hostnames(module, cherryservers_conn, hostnames)
 
+    server_ids = set(server_ids)
+
     for server_id in server_ids:
         (changed, server) = terminate_server(module, cherryservers_conn, server_id)
         servers.append(server)
