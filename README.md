@@ -28,7 +28,7 @@ In order to use those modules you need to download module files from [bitbucket]
 Requirements
 ------------
 
-The Cherry Servers module connects to Cherry Servers Public API via cherry-python package. You need to install it with pip:
+The Cherry Servers module connects to Cherry Servers Public API via [cherry-python](https://pypi.org/project/cherry-python/) package. You need to install it with __pip__:
 
 ```
 $ pip install cherry-python
@@ -50,7 +50,7 @@ Most of the time you will need several UUIDs or specific names to work with thos
 Manage SSH keys
 ---------------
 
-Adds raw ssh key to Client Portal:
+Adds raw SSH key to Client Portal:
 
 ```
 - name: Cherry Servers API module
@@ -64,7 +64,7 @@ Adds raw ssh key to Client Portal:
       state: present
 ```
 
-Adds ssh key from file to Client Portal:
+Adds SSH key from file to Client Portal:
 
 ```
 - name: Cherry Servers API module
@@ -78,7 +78,65 @@ Adds ssh key from file to Client Portal:
       state: present
 ```
 
-After that just run playbook like this:
+Remove existing SSH key by label:
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Removes SSH keys
+    cherryservers_sshkey:
+      label:
+        - 'testas'
+        - 'trylika'
+      state: absent
+```
+
+Remove existing SSH key by ID:
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Removes SSH keys
+    cherryservers_sshkey:
+      key_id:
+        - '127'
+        - '125'
+      state: absent
+```
+
+Remove existing SSH key by fingerprint: 
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Removes SSH keys
+    cherryservers_sshkey:
+      fingerprint:
+        - 'cf:dc:ee:96:00:cb:c6:e2:fd:49:5c:64:0a:85:e9:47'
+        - '88:b9:88:43:b3:24:53:55:85:88:61:cc:a0:7d:cb:f0'
+      state: absent
+```
+
+Remove existing SSH key by file: 
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Removes SSH keys
+    cherryservers_sshkey:
+      key_file:
+        - key_file_jonas.pub
+        - key_file_kestas.pub
+        - key_file_mantas.pub
+        - key_file_marius.pub
+      state: absent
+```
+
+After you create a playbook just run playbook like this:
 
 ```
 ansible-playbook ssh_key_add.yml
