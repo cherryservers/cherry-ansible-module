@@ -47,8 +47,11 @@ Most of the time you will need several UUIDs or specific names to work with thos
 * __image__ - you will need to specify it to work with cherryservers_server module.
 * __region__ - you will need to specify it to work with cherryservers_server and cherryservers_ips module.
 
-Parameters - cherryservers_sshkey module
-----------
+
+Manage SSH keys
+---------------
+
+* cherryservers_sshkey module
 
 Parameter   | Choices/Defaults   | Comments 
 :-----------| :----------------- |:-----
@@ -59,9 +62,6 @@ __fingerprint__ |                    | Fingerprint of SSH key.
 __key_file__    |                    | Path to SSH key file.
 __key__         |                    | RAW key
 __state__       | __Choices__: _present, absent_ | Define desired state of SSH key
-
-Manage SSH keys
----------------
 
 Adds raw SSH key to Client Portal:
 
@@ -155,8 +155,10 @@ After you create a playbook just run playbook like this:
 ansible-playbook ssh_key_add.yml
 ```
 
-Parameters - cherryservers_server module
-----------
+Manage Servers
+--------------
+
+* cherryservers_server module
 
 Parameter   | Choices/Defaults   | Comments 
 :-----------| :----------------- |:-----
@@ -176,10 +178,148 @@ __count_offset__    | __default__: 1     | From which number to start the count.
 __wait_timeout__    | __default__: 1800  | How long to wait for server to reach `active` state.
 __state__            | __Choices__: _absent, active, rebooted, present, stopped, running_ | Define desired state of the server. If set to `present`, the module will return back immediately after API call returns. If set to `active`, the module will wait for `wait_timeout` for server to be in `active` state.
 
-Manage Servers
---------------
+Deploy server with added SSH key in it
 
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Deploy CherryServers Server
+    cherryservers_server:
+      hostname:
+        - server%02d.example.com
+      plan_id: '161'
+      project_id: '79813'
+      image: 'Ubuntu 16.04 64bit'
+      region: 'EU-East-1'
+      state: present
+      count: 1
+      count_offset: 4
+      ssh_label:
+        - john
+        - marius
+```
 
+Cancel several servers
+
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Remove CherryServers server
+    cherryservers_server:
+      project_id: '79813'
+      hostname:
+        - 'server03.example.com'
+        - 'server04.example.com'
+        - 'server06.example.com'
+      state: absent
+```
+
+Deploy several servers and wait to them to be active
+
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Deploy CherryServers Server
+    cherryservers_server:
+      hostname:
+        - server%02d.example.com
+      plan_id: '161'
+      project_id: '79813'
+      image: 'Ubuntu 16.04 64bit'
+      region: 'EU-East-1'
+      state: active
+      count: 2
+      count_offset: 1
+```
 
 Manage Floating IPs
 -------------------
+
+* cherryservers_ips module
+
+Parameter   | Choices/Defaults   | Comments 
+:-----------| :----------------- |:-----
+__auth_token__          |                    | Authenticating API token provided by Cherry Servers. You can supply it via `CHERRY_AUTH_TOKEN` environement variable.
+__project_id__          |                    | ID of project of the servers.
+__ptr_record__          |                    | Your preferable reverse
+__ia_record__           |                    | Easy memorizable hostname
+__routed_to_ip__        |                    | IP address of the server to route Floating IP to.
+__routed_to_hostname__  |                    |  Hostname of the server to route Floating IP to.
+__routed_to_server_id__ |                    | Server ID of the server to route Floating IP to.
+__ip_address_id__       |                    | Floating IP address ID to update or remove.
+__ip_address__          |                    | Floating IP address to update or remove.
+__region__              |                    | Region of the Floating IP address.
+__cout__                | __default__: 1     | Count of Floating IP addresses to add.
+__state__               | __Choices__: _present, absent, update_ | Define desired state of the IPs.
+
+Add one Floating IP routed to server`s IP address
+
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id : '79813'
+    region : 'EU-East-1'
+    ptr_record : 'your-preferable-reverse.example.com'
+    a_record : 'easy-memorizable-hostname.cloud.cherryservers.com'
+    routed_to_ip: 'xxx.xxx.xxx.xxx'
+    state: present
+```
+
+Add several Floating IPs routed to server`s hostname
+
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id : '79813'
+    region : 'EU-East-1'
+    ptr_record : 'your-preferable-reverse.example.com'
+    a_record : 'easy-memorizable-hostname.cloud.cherryservers.com'
+    routed_to_hostname: 'server04.example.com'
+    state: present
+```
+
+Modify Floating IP route to different server`s hostname
+
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id: '79813'
+    ip_address_id: '2593fd9b-a0a1-10ce-13ce-2f7d7ad99eca'
+    ptr_record: 'your-preferable-reverse.example.com'
+    routed_to_hostname: easy-memorizable-hostname
+    a_record: 'arturas1'
+    state: update
+```
+
+Remove specific Floating IP address
+
+```
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Manage IP addresses
+    cherryservers_ips:
+    project_id: '79813'
+    ip_address: 
+      - 'xxx.xxx.xxx.xxx'
+    state: absent
+```
