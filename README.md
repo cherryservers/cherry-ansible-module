@@ -47,10 +47,8 @@ Most of the time you will need several UUIDs or specific names to work with thos
 * __image__ - you will need to specify it to work with cherryservers_server module.
 * __region__ - you will need to specify it to work with cherryservers_server and cherryservers_ips module.
 
-Parameters
+Parameters - cherryservers_sshkey module
 ----------
-
-###cherryservers_sshkey module:
 
 Parameter   | Choices/Defaults   | Comments 
 :-----------| :----------------- |:-----
@@ -61,7 +59,6 @@ __fingerprint__ |                    | Fingerprint of SSH key.
 __key_file__    |                    | Path to SSH key file.
 __key__         |                    | RAW key
 __state__       | __Choices__: _present, absent_ | Define desired state of SSH key
-
 
 Manage SSH keys
 ---------------
@@ -158,8 +155,31 @@ After you create a playbook just run playbook like this:
 ansible-playbook ssh_key_add.yml
 ```
 
+Parameters - cherryservers_server module
+----------
+
+Parameter   | Choices/Defaults   | Comments 
+:-----------| :----------------- |:-----
+__auth_token__      |                    | Authenticating API token provided by Cherry Servers. You can supply it via `CHERRY_AUTH_TOKEN` environement variable.
+__project_id__      |                    |  ID of project of the servers.
+__hostname__        |                    | Define hostname of server.
+__image__           |                    | Image to install on the server, e.g. `Ubuntu 16.04 64bit`.
+__ip_address__      |                    | List of floating IP addresses to add to new server.
+__ip_address_id__   |                    |  List of floating IP addresses UIDs to add to new server.
+__plan_id__         |                    | Plan for server creation.
+__ssh_key_id__      |                    | SSH key`s ID to add SSH key to server.
+__ssh_label__       |                    | SSH key`s label to add SSH key to server.
+__server_ids__      |                    |  List of server`s IDs on which to operate.
+__region__          |                    | Region of the server.
+__cout__            | __default__: 1     | Amount of servers to create.
+__count_offset__    | __default__: 1     | From which number to start the count.
+__wait_timeout__    | __default__: 1800  | How long to wait for server to reach `active` state.
+__state__            | __Choices__: _absent, active, rebooted, present, stopped, running_ | Define desired state of the server. If set to `present`, the module will return back immediately after API call returns. If set to `active`, the module will wait for `wait_timeout` for server to be in `active` state.
+
 Manage Servers
 --------------
+
+
 
 Manage Floating IPs
 -------------------
