@@ -66,6 +66,7 @@ __state__       | __Choices__: _present, absent_ | Define desired state of SSH k
 Adds raw SSH key to Client Portal:
 
 ```
+# ssh_add_keys.yml
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -80,6 +81,7 @@ Adds raw SSH key to Client Portal:
 Adds SSH key from file to Client Portal:
 
 ```
+# ssh_add_keys.yml
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -93,6 +95,7 @@ Adds SSH key from file to Client Portal:
 
 Remove existing SSH key by label:
 ```
+# ssh_remove_keys.yml
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -107,6 +110,7 @@ Remove existing SSH key by label:
 
 Remove existing SSH key by ID:
 ```
+# ssh_remove_keys.yml
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -121,6 +125,7 @@ Remove existing SSH key by ID:
 
 Remove existing SSH key by fingerprint: 
 ```
+# ssh_remove_keys.yml
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -135,6 +140,7 @@ Remove existing SSH key by fingerprint:
 
 Remove existing SSH key by file: 
 ```
+# ssh_remove_keys.yml
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -152,7 +158,7 @@ Remove existing SSH key by file:
 After you create a playbook just run playbook like this:
 
 ```
-ansible-playbook ssh_key_add.yml
+ansible-playbook ssh_add_keys.yml
 ```
 
 Manage Servers
@@ -164,7 +170,7 @@ Parameter   | Choices/Defaults   | Comments
 :-----------| :----------------- |:-----
 __auth_token__      | __Required__: true | Authenticating API token provided by Cherry Servers. You can supply it via `CHERRY_AUTH_TOKEN` environement variable.
 __project_id__      | __Required__: true |  ID of project of the servers.
-__hostname__        |                    | Define hostname of server.
+__hostname__        |                    | Define hostname of server. You may specify `%02d` or `%03d` depending how many servers you need, dozens or hundreds. By specifying `%02d` with count `3`, you will get hostnames numerated from `01` to `03`, in case of `%03d` it will generate range from `001` to `003`.
 __image__           |                    | Image to install on the server, e.g. `Ubuntu 16.04 64bit`.
 __ip_address__      |                    | List of floating IP addresses to add to new server.
 __ip_address_id__   |                    |  List of floating IP addresses UIDs to add to new server.
