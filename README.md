@@ -4,23 +4,23 @@ Cherry Servers ansible module
 Introduction
 ------------
 
-Cherry Servers is a bare-metal hosting company aimed at enterprise-level clients supports these Ansible modules:
+Cherry Servers is an international Bare Metal Cloud provider and supports the following Ansible modules:
 
-* __cherryservers_sshkey__: manages public keys on Client Portal. Later on you may add those keys to deploying servers.
-* __cherryservers_ips__: manages floating IPs at Client Portal. You may order additional IPs, route them to existing servers etc.
-* __cherryservers_server__: manages servers at Cherry Servers. You can Deploy, Terminate server, manage its power etc.
+* __cherryservers_sshkey__: manages public SSH keys on Client Portal. You may assign these keys to your chosen servers upon deployment.
+* __cherryservers_ips__: manages floating IPs at Client Portal. You may order additional IPs, route them to existing servers, etc.
+* __cherryservers_server__: manages servers at Cherry Servers. You may Deploy and Terminate servers, manage theyr power, etc.
 
 Installation
 ------------
 
-In order to use those modules you need to download module files from [bitbucket](https://bitbucket.org/cherryservers/cherry_ansible_module) and put them to folder named **library** and move it to folder with your ansible playbooks, i.e.:
+In order to use above mentioned modules you need to download files from [bitbucket](https://bitbucket.org/cherryservers/cherry_ansible_module) , put them into folder named **library** and move it to your ansible playbooks directory, for instance:
 
 ```
 └── cherry_servers_playbooks
     ├── library
-    │   ├── cherryservers_ips.py
-    │   ├── cherryservers_server.py
-    │   └── cherryservers_sshkey.py
+    │   ├── cherryservers_ips.py
+    │   ├── cherryservers_server.py
+    │   └── cherryservers_sshkey.py
     ├── servers_deploy.yml
     └── servers_terminate.yml
 ```
@@ -34,7 +34,7 @@ The Cherry Servers module connects to Cherry Servers Public API via [cherry-pyth
 $ pip install cherry-python
 ```
 
-In order to use Ansible module you will need to export Cherry Servers API token. You can generate ant get token from Client Portal. The easiest way is to export variable like this:
+In order to use Ansible module you will need to export Cherry Servers API token. You can generate and get it from your Client Portal. The easiest way is to export variable like this:
 
 ```
 $ export CHERRY_API_TOKEN="2b00042f7481c7b056c4b410d28f33cf"
@@ -63,7 +63,7 @@ __key_file__    |                    | Path to SSH key file.
 __key__         |                    | RAW key
 __state__       | __Choices__: _present, absent_ | Define desired state of SSH key
 
-Adds raw SSH key to Client Portal:
+Add new SSH key from raw input to Client Portal:
 
 ```
 # ssh_add_keys.yml
@@ -79,7 +79,7 @@ Adds raw SSH key to Client Portal:
       state: present
 ```
 
-Adds SSH key from file to Client Portal:
+Add new SSH key from selected file to Client Portal:
 
 ```
 # ssh_add_keys.yml
@@ -161,7 +161,7 @@ Remove existing SSH key by file:
       state: absent
 ```
 
-After you create a playbook just run playbook like this:
+After you have created a playbook, you can run it like this:
 
 ```
 ansible-playbook ssh_add_keys.yml
@@ -176,21 +176,21 @@ Parameter   | Choices/Defaults   | Comments
 :-----------| :----------------- |:-----
 __auth_token__      | __Required__: true | Authenticating API token provided by Cherry Servers. You can supply it via `CHERRY_AUTH_TOKEN` environement variable.
 __project_id__      | __Required__: true |  ID of project of the servers.
-__hostname__        |                    | Define hostname of server. You may specify `%02d` or `%03d` depending how many servers you need, dozens or hundreds. By specifying `%02d` with count `3`, you will get hostnames numerated from `01` to `03`, in case of `%03d` it will generate range from `001` to `003`.
-__image__           |                    | Image to install on the server, e.g. `Ubuntu 16.04 64bit`.
-__ip_address__      |                    | List of floating IP addresses to add to new server.
-__ip_address_id__   |                    |  List of floating IP addresses UIDs to add to new server.
+__hostname__        |                    | Define hostname of server. You may specify `%02d` or `%03d` depending how many servers you need - dozens or hundreds. By specifying `%02d` with count `3`, you will get hostnames numerated from `01` to `03`, in case of `%03d` it will generate range from `001` to `003`.
+__image__           |                    | Image to be installed on the server, e.g. `Ubuntu 16.04 64bit`.
+__ip_address__      |                    | List of floating IP addresses to be added to new server.
+__ip_address_id__   |                    |  List of floating IP addresses UIDs to be added to a new server.
 __plan_id__         |                    | Plan for server creation.
-__ssh_key_id__      |                    | SSH key`s ID to add SSH key to server.
-__ssh_label__       |                    | SSH key`s label to add SSH key to server.
-__server_ids__      |                    |  List of server`s IDs on which to operate.
+__ssh_key_id__      |                    | SSH key`s ID for adding SSH key to server.
+__ssh_label__       |                    | SSH key`s label for adding SSH key to server.
+__server_ids__      |                    |  List of servers' IDs on which to operate.
 __region__          |                    | Region of the server.
-__cout__            | __default__: 1     | Amount of servers to create.
+__cout__            | __default__: 1     | Amount of servers to be created.
 __count_offset__    | __default__: 1     | From which number to start the count.
 __wait_timeout__    | __default__: 1800  | How long to wait for server to reach `active` state.
 __state__            | __Choices__: _absent, active, rebooted, present, stopped, running_ | Define desired state of the server. If set to `present`, the module will return back immediately after API call returns. If set to `active`, the module will wait for `wait_timeout` for server to be in `active` state.
 
-Deploy server with added SSH key in it
+Deploy server with selected SSH keys on it
 
 ```
 # server_deploy.yml
@@ -215,7 +215,7 @@ Deploy server with added SSH key in it
         - marius
 ```
 
-Cancel several servers
+Terminate servers
 
 ```
 # server_terminate.yml
@@ -234,7 +234,7 @@ Cancel several servers
       state: absent
 ```
 
-Deploy several servers and wait to them to be active
+Deploy servers and wait for them to be active
 
 ```
 # server_deploy.yml
@@ -256,7 +256,7 @@ Deploy several servers and wait to them to be active
       count_offset: 1
 ```
 
-After you create a playbook just run playbook like this:
+After you have created a playbook, just run it like this:
 
 ```
 ansible-playbook server_deploy.yml
@@ -277,9 +277,9 @@ __routed_to_ip__        |                    | IP address of the server to route
 __routed_to_hostname__  |                    |  Hostname of the server to route Floating IP to.
 __routed_to_server_id__ |                    | Server ID of the server to route Floating IP to.
 __ip_address_id__       |                    | Floating IP address ID to update or remove.
-__ip_address__          |                    | Floating IP address to update or remove.
+__ip_address__          |                    | Floating IP address to be updated or removed.
 __region__              |                    | Region of the Floating IP address.
-__cout__                | __default__: 1     | Count of Floating IP addresses to add.
+__cout__                | __default__: 1     | Count of Floating IP addresses to be added.
 __state__               | __Choices__: _present, absent, update_ | Define desired state of the IPs.
 
 Add one Floating IP routed to server`s IP address
@@ -356,7 +356,7 @@ Remove specific Floating IP address
     state: absent
 ```
 
-After you create a playbook just run playbook like this:
+After you have created a playbook, just run it like this:
 
 ```
 ansible-playbook ip_add.yml
