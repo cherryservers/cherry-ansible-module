@@ -256,6 +256,12 @@ Deploy several servers and wait to them to be active
       count_offset: 1
 ```
 
+After you create a playbook just run playbook like this:
+
+```
+ansible-playbook server_deploy.yml
+```
+
 Manage Floating IPs
 -------------------
 
@@ -348,4 +354,10 @@ Remove specific Floating IP address
     ip_address: 
       - 'xxx.xxx.xxx.xxx'
     state: absent
+```
+
+After you create a playbook just run playbook like this:
+
+```
+ansible-playbook ip_add.yml
 ```
