@@ -67,6 +67,7 @@ Adds raw SSH key to Client Portal:
 
 ```
 # ssh_add_keys.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -82,6 +83,7 @@ Adds SSH key from file to Client Portal:
 
 ```
 # ssh_add_keys.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -96,6 +98,7 @@ Adds SSH key from file to Client Portal:
 Remove existing SSH key by label:
 ```
 # ssh_remove_keys.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -111,6 +114,7 @@ Remove existing SSH key by label:
 Remove existing SSH key by ID:
 ```
 # ssh_remove_keys.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -126,6 +130,7 @@ Remove existing SSH key by ID:
 Remove existing SSH key by fingerprint: 
 ```
 # ssh_remove_keys.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -141,6 +146,7 @@ Remove existing SSH key by fingerprint:
 Remove existing SSH key by file: 
 ```
 # ssh_remove_keys.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -187,6 +193,8 @@ __state__            | __Choices__: _absent, active, rebooted, present, stopped,
 Deploy server with added SSH key in it
 
 ```
+# server_deploy.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -210,6 +218,8 @@ Deploy server with added SSH key in it
 Cancel several servers
 
 ```
+# server_terminate.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -227,6 +237,8 @@ Cancel several servers
 Deploy several servers and wait to them to be active
 
 ```
+# server_deploy.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -267,6 +279,8 @@ __state__               | __Choices__: _present, absent, update_ | Define desire
 Add one Floating IP routed to server`s IP address
 
 ```
+# ip_add.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -284,6 +298,8 @@ Add one Floating IP routed to server`s IP address
 Add several Floating IPs routed to server`s hostname
 
 ```
+# ip_add.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -301,6 +317,8 @@ Add several Floating IPs routed to server`s hostname
 Modify Floating IP route to different server`s hostname
 
 ```
+# ip_update.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
@@ -318,6 +336,8 @@ Modify Floating IP route to different server`s hostname
 Remove specific Floating IP address
 
 ```
+# ip_terminate.yml
+
 - name: Cherry Servers API module
   connection: local
   hosts: localhost
