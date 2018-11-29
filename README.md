@@ -47,18 +47,20 @@ Most of the time you will need several UUIDs or specific names to work with thos
 * __image__ - you will need to specify it to work with cherryservers_server module.
 * __region__ - you will need to specify it to work with cherryservers_server and cherryservers_ips module.
 
-Parameters of cherryservers_sshkey
-----------------------------------
+Parameters
+----------
+
+###cherryservers_sshkey module:
 
 Parameter   | Choices/Defaults   | Comments 
 :-----------| :----------------- |:-----
-auth_token  |                    | Authenticating API token provided by Cherry Servers. You can supply it via __CHERRY_AUTH_TOKEN__ environement variable.
-label       |                    | Label of SSH key.
-id          |                    | ID of SSH key.
-fingerprint |                    | Fingerprint of SSH key.
-key_file    |                    | Path to SSH key file.
-key         |                    | RAW key
-state       | __Choices__: _present, absent_ | Define desired state of SSH key
+__auth_token__  |                    | Authenticating API token provided by Cherry Servers. You can supply it via `CHERRY_AUTH_TOKEN` environement variable.
+__label__       |                    | Label of SSH key.
+__id__          |                    | ID of SSH key.
+__fingerprint__ |                    | Fingerprint of SSH key.
+__key_file__    |                    | Path to SSH key file.
+__key__         |                    | RAW key
+__state__       | __Choices__: _present, absent_ | Define desired state of SSH key
 
 
 Manage SSH keys
