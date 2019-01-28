@@ -37,7 +37,7 @@ $ pip install cherry-python
 In order to use Ansible module you will need to export Cherry Servers API token. You can generate and get it from your Client Portal. The easiest way is to export variable like this:
 
 ```
-$ export CHERRY_API_TOKEN="2b00042f7481c7b056c4b410d28f33cf"
+$ export CHERRY_AUTH_TOKEN="2b00042f7481c7b056c4b410d28f33cf"
 ```
 
 Most of the time you will need several UUIDs or specific names to work with those modules:
