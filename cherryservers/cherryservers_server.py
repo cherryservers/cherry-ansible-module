@@ -259,7 +259,7 @@ def run_module():
                     srv_id = srv['id']
                     deploying_servers_ids.append(srv_id)
 
-            wait_for_resource(module, cherryservers_conn, deploying_servers_ids)
+            server = wait_for_resource(module, cherryservers_conn, deploying_servers_ids)
 
     elif state == 'absent':
 
@@ -540,13 +540,15 @@ def wait_for_resource(module, cherryservers_conn, deploying_servers_ids):
         time.sleep(wait_step)
 
         current_states = []
+        current_servers = []
         for server_id in deploying_servers_ids:
             current_server = cherryservers_conn.get_server(server_id)
             if 'id' in current_server:
                 current_states.append(current_server['state'])
+                current_servers.append(current_server)
 
         if all(state == 'active' for state in current_states):
-            return 
+            return current_servers
 
     raise Exception("Timed out waiting for active device: %s" % server_id)
 
