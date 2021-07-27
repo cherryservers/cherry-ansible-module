@@ -185,10 +185,11 @@ __ssh_key_id__      |                    | SSH key`s ID for adding SSH key to se
 __ssh_label__       |                    | SSH key`s label for adding SSH key to server.
 __server_ids__      |                    |  List of servers' IDs on which to operate.
 __region__          |                    | Region of the server.
-__cout__            | __default__: 1     | Amount of servers to be created.
+__spot_market__     | __default__: 0     | Request server as a [spot server](https://docs.cherryservers.com/knowledge/spot-servers).
+__count__           | __default__: 1     | Amount of servers to be created.
 __count_offset__    | __default__: 1     | From which number to start the count.
 __wait_timeout__    | __default__: 1800  | How long to wait for server to reach `active` state.
-__state__            | __Choices__: _absent, active, rebooted, present, stopped, running_ | Define desired state of the server. If set to `present`, the module will return back immediately after API call returns. If set to `active`, the module will wait for `wait_timeout` for server to be in `active` state.
+__state__           | __Choices__: _absent, active, rebooted, present, stopped, running_ | Define desired state of the server. If set to `present`, the module will return back immediately after API call returns. If set to `active`, the module will wait for `wait_timeout` for server to be in `active` state.
 
 Deploy server with selected SSH keys on it
 
