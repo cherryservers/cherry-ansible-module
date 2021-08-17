@@ -92,6 +92,11 @@ options:
       - Order server from spot market.
     default: 0
 
+  storage_id:
+    description:
+      - Elastic block storage ID.
+    default: 0
+
 requirements:
   - "cherry"
   - "python >= 2.6"
@@ -217,7 +222,8 @@ def run_module():
         ssh_label = dict(type = 'list'),
         state = dict(choices = MODULE_STATES, default = 'present'),
         wait_timeout = dict(type = 'int', default = 1800),
-        spot_market = dict(type = 'int', default = 0)
+        spot_market = dict(type = 'int', default = 0),
+        storage_id = dict(type = 'int', required = False)
 
     )
 
@@ -514,6 +520,7 @@ def create_server(module, cherryservers_conn, hostname, ssh_keys, floating_ip_ui
     region = module.params['region']
     plan_id = module.params['plan_id']
     spot_market = module.params['spot_market']
+    storage_id = module.params['storage_id']
 
     server = cherryservers_conn.create_server(
         project_id=project_id,
@@ -523,7 +530,9 @@ def create_server(module, cherryservers_conn, hostname, ssh_keys, floating_ip_ui
         ip_addresses=floating_ip_uids,
         ssh_keys=ssh_keys,
         plan_id=plan_id,
-        spot_market=spot_market)
+        spot_market=spot_market,
+        storage_id=storage_id,
+        fields='id')
 
     check_for_errors(module, server)
     
