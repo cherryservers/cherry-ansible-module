@@ -12,8 +12,8 @@ module: cherryservers_server
 short_description: Manage a bare metal servers at Cherry Servers.
 description:
      - Manage a bare metal servers at Cherry Servers.
-     - This module has a dependency on cherry >= 0.1.
-version_added: "0.1"
+     - This module has a dependency on cherry >= 0.2.
+version_added: "0.2"
 
 options:
 
@@ -86,6 +86,16 @@ options:
     description:
       - From which number to start the count.
     default: 1
+
+  spot_market:
+    description:
+      - Order server from spot market.
+    default: 0
+
+  storage_id:
+    description:
+      - Elastic block storage ID.
+    default: 0
 
 requirements:
   - "cherry"
@@ -211,7 +221,9 @@ def run_module():
         ssh_key_id = dict(type = 'list'),
         ssh_label = dict(type = 'list'),
         state = dict(choices = MODULE_STATES, default = 'present'),
-        wait_timeout = dict(type = 'int', default = 1800)
+        wait_timeout = dict(type = 'int', default = 1800),
+        spot_market = dict(type = 'int', default = 0),
+        storage_id = dict(type = 'int', required = False)
 
     )
 
@@ -507,6 +519,8 @@ def create_server(module, cherryservers_conn, hostname, ssh_keys, floating_ip_ui
     image = module.params['image']
     region = module.params['region']
     plan_id = module.params['plan_id']
+    spot_market = module.params['spot_market']
+    storage_id = module.params['storage_id']
 
     server = cherryservers_conn.create_server(
         project_id=project_id,
@@ -515,7 +529,10 @@ def create_server(module, cherryservers_conn, hostname, ssh_keys, floating_ip_ui
         region=region,
         ip_addresses=floating_ip_uids,
         ssh_keys=ssh_keys,
-        plan_id=plan_id)
+        plan_id=plan_id,
+        spot_market=spot_market,
+        storage_id=storage_id,
+        fields='id')
 
     check_for_errors(module, server)
     

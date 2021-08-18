@@ -185,10 +185,11 @@ __ssh_key_id__      |                    | SSH key`s ID for adding SSH key to se
 __ssh_label__       |                    | SSH key`s label for adding SSH key to server.
 __server_ids__      |                    |  List of servers' IDs on which to operate.
 __region__          |                    | Region of the server.
-__cout__            | __default__: 1     | Amount of servers to be created.
+__spot_market__     | __default__: 0     | Request server as a [spot server](https://docs.cherryservers.com/knowledge/spot-servers).
+__count__           | __default__: 1     | Amount of servers to be created.
 __count_offset__    | __default__: 1     | From which number to start the count.
 __wait_timeout__    | __default__: 1800  | How long to wait for server to reach `active` state.
-__state__            | __Choices__: _absent, active, rebooted, present, stopped, running_ | Define desired state of the server. If set to `present`, the module will return back immediately after API call returns. If set to `active`, the module will wait for `wait_timeout` for server to be in `active` state.
+__state__           | __Choices__: _absent, active, rebooted, present, stopped, running_ | Define desired state of the server. If set to `present`, the module will return back immediately after API call returns. If set to `active`, the module will wait for `wait_timeout` for server to be in `active` state.
 
 Deploy server with selected SSH keys on it
 
@@ -360,4 +361,104 @@ After you have created a playbook, just run it like this:
 
 ```
 ansible-playbook ip_add.yml
+```
+
+Manage Storage Volume
+-------------------
+
+* cherryservers_storage module
+
+Parameter   | Choices/Defaults   | Comments 
+:-----------| :----------------- |:-----
+__auth_token__          | __Required__: true | Authenticating API token provided by Cherry Servers. You can supply it via `CHERRY_AUTH_TOKEN` environement variable.
+__project_id__          | __Required__: true | ID of project of the volume.
+__storage_volume_id__   |                    | Storage volume ID to update or remove.
+__attach_to_id__        |                    | ID of the server to attach volume to.
+__attach_to_hostname__  |                    | Hostname of the server to attach volume to.
+__size__                |                    | Volume size to create or update.
+__description__         |                    | Volume description.
+__region__              |                    | Region of the Floating IP address.
+__state__               | __Choices__: _present, absent, update_ | Define desired state of the volume.
+
+Request new storage volume
+
+```
+# storage_create.yml
+
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Request new storage volume
+    cherryservers_storage:
+    project_id : '79813'
+    region : 'EU-Nord-1'
+    size: 256
+    description: 'my-new-storage-volume'
+    state: present
+```
+
+Attach storage to server
+
+```
+# storage_attach.yml
+
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Attach volume to server
+    cherryservers_storage:
+    project_id: '79813'
+    storage_volume_id: 388268
+    state: update
+```
+
+Detach storage from a server
+
+```
+# storage_detach.yml
+
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Detach volume from a server
+    cherryservers_storage:
+    project_id: '79813'
+    state: update
+```
+
+Upgrade storage volume size and/or description
+
+```
+# storage_upgrade.yml
+
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Detach volume from server
+    cherryservers_storage:
+    project_id: '79813'
+    storage_volume_id: 388268
+    size:512
+    description: 'my-upgraded-storage-volume'
+    state: update
+```
+
+Delete storage volume
+
+```
+# storage_delete.yml
+
+- name: Cherry Servers API module
+  connection: local
+  hosts: localhost
+  tasks:
+  - name: Delete storage volume
+    cherryservers_storage:
+    project_id: '79813'
+    storage_volume_id: 388268
+    state: absent
 ```
