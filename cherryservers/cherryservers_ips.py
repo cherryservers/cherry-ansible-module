@@ -516,10 +516,10 @@ def update_ip_address(module, cherryservers_conn, floating_ip_uid):
     ip = cherryservers_conn.update_ip_address(
             project_id, 
             floating_ip_uid, 
-            ptr_record, 
-            a_record, 
-            routed_to,
-            assigned_to)
+            ptr_record=ptr_record, 
+            a_record=a_record, 
+            routed_to=routed_to,
+            assigned_to=assigned_to)
 
     check_for_errors(module, ip)
 
