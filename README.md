@@ -1,6 +1,11 @@
 Cherry Servers ansible module 
 =============================
 
+WARNING
+-------
+
+Beware, this module has been obsoleted by [Cherry Servers Ansible collection ](https://github.com/cherryservers/ansible-collection-cherryservers).
+
 Introduction
 ------------
 
